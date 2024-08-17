@@ -30,19 +30,15 @@ impl<T> Stack<T> for LinkedStack<T> {
     }
 
     fn pop(&mut self) -> Option<T> {
-        self.top.take().map(|current_node| {
-            self.top = current_node.next;
+        self.top.take().map(|old_top| {
+            self.top = old_top.next;
             self.size -= 1;
-            current_node.value
+            old_top.value
         })
     }
 
     fn peek(&self) -> Option<&T> {
         self.top.as_ref().map(|node| &node.value)
-    }
-
-    fn is_empty(&self) -> bool {
-        self.size == 0
     }
 
     fn size(&self) -> usize {
