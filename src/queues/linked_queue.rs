@@ -68,10 +68,14 @@ impl<T: Clone> Queue<T> for LinkedQueue<T> {
         })
     }
 
-    fn front(&self) -> Option<T> {
-        self.front
-            .as_ref()
-            .map(|front| RefCell::clone(front).into_inner().value)
+    fn front(&self) -> Option<&T> {
+        if self.is_empty() {
+            None
+        } else {
+            self.front
+                .clone()
+                .map(|front| unsafe { &(*front.as_ptr()).value })
+        }
     }
 
     fn size(&self) -> usize {
@@ -127,12 +131,12 @@ mod tests {
         queue.enqueue(20);
         queue.enqueue(30);
 
-        assert_eq!(queue.front(), Some(10));
+        assert_eq!(queue.front(), Some(&10));
         assert_eq!(queue.size(), 3);
 
         // Front should remain the same after dequeue until the front element is removed
         queue.dequeue();
-        assert_eq!(queue.front(), Some(20));
+        assert_eq!(queue.front(), Some(&20));
     }
 
     #[test]
@@ -140,15 +144,15 @@ mod tests {
         let mut queue = LinkedQueue::new();
         queue.enqueue(10);
         queue.enqueue(20);
-        assert_eq!(queue.front(), Some(10));
+        assert_eq!(queue.front(), Some(&10));
 
         queue.dequeue();
         queue.enqueue(30);
         queue.enqueue(40);
-        assert_eq!(queue.front(), Some(20));
+        assert_eq!(queue.front(), Some(&20));
 
         queue.dequeue();
-        assert_eq!(queue.front(), Some(30));
+        assert_eq!(queue.front(), Some(&30));
         assert_eq!(queue.size(), 2);
     }
 }
