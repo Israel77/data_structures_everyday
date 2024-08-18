@@ -3,7 +3,6 @@ use super::stack::Stack;
 const INITIAL_CAPACITY: usize = 2048;
 pub struct ArrayStack<T: Copy> {
     array: Box<[Option<T>]>,
-    capacity: usize,
     stack_pointer: usize,
 }
 
@@ -11,7 +10,6 @@ impl<T: Copy> ArrayStack<T> {
     pub fn new() -> Self {
         Self {
             array: Box::from([None; INITIAL_CAPACITY]),
-            capacity: INITIAL_CAPACITY,
             stack_pointer: 0,
         }
     }
@@ -21,22 +19,25 @@ impl<T: Copy> ArrayStack<T> {
             panic!("Cannot shrink stack!")
         }
 
-        self.capacity = new_capacity;
-        let mut new_array = vec![None; self.capacity].into_boxed_slice();
+        let mut new_array = vec![None; self.array.len()].into_boxed_slice();
         for i in 0..self.size() {
             new_array[i] = self.array[i];
         }
         self.array = new_array;
     }
+
+    fn capacity(&self) -> usize {
+        self.array.len()
+    }
 }
 
 impl<T: Copy> Stack<T> for ArrayStack<T> {
     fn push(&mut self, value: T) {
-        if self.size() < self.capacity {
+        if self.size() < self.capacity() {
             self.array[self.stack_pointer] = Some(value);
             self.stack_pointer += 1;
         } else {
-            self.resize(self.capacity * 2);
+            self.resize(self.capacity() * 2);
             self.push(value);
         }
     }
