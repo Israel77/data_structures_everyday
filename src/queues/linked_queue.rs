@@ -19,13 +19,13 @@ impl<T> Node<T> {
         Some(Rc::new(RefCell::from(self)))
     }
 }
-pub struct LinkedQueue<T> {
+pub struct LinkedQueue<T: Clone> {
     front: NodeLink<T>,
     rear: NodeLink<T>,
     size: usize,
 }
 
-impl<T> LinkedQueue<T> {
+impl<T: Clone> LinkedQueue<T> {
     pub fn new() -> Self {
         Self {
             front: None,
@@ -59,7 +59,7 @@ impl<T: Clone> Queue<T> for LinkedQueue<T> {
         }
 
         self.front.take().map(|prev_front| {
-            self.front = RefCell::clone(&prev_front).into_inner().next;
+            self.front = prev_front.clone().as_ref().borrow().next.clone();
             self.size -= 1;
             if self.size == 0 {
                 self.rear = None
@@ -80,6 +80,12 @@ impl<T: Clone> Queue<T> for LinkedQueue<T> {
 
     fn size(&self) -> usize {
         self.size
+    }
+}
+
+impl<T: Clone> Drop for LinkedQueue<T> {
+    fn drop(&mut self) {
+        while let Some(_) = self.dequeue() {}
     }
 }
 

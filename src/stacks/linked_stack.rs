@@ -46,6 +46,12 @@ impl<T> Stack<T> for LinkedStack<T> {
     }
 }
 
+impl<T> Drop for LinkedStack<T> {
+    fn drop(&mut self) {
+        while let Some(_) = self.pop() {}
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

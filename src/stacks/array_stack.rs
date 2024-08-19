@@ -2,15 +2,15 @@ use super::stack::Stack;
 
 const INITIAL_CAPACITY: usize = 2048;
 
-pub struct ArrayStack<T: Copy> {
+pub struct ArrayStack<T: Clone> {
     array: Box<[Option<T>]>,
     stack_pointer: usize,
 }
 
-impl<T: Copy> ArrayStack<T> {
+impl<T: Clone> ArrayStack<T> {
     pub fn new() -> Self {
         Self {
-            array: Box::from([None; INITIAL_CAPACITY]),
+            array: vec![None; INITIAL_CAPACITY].into_boxed_slice(),
             stack_pointer: 0,
         }
     }
@@ -27,7 +27,7 @@ impl<T: Copy> ArrayStack<T> {
 
         let mut new_array = vec![None; self.array.len()].into_boxed_slice();
         for i in 0..self.size() {
-            new_array[i] = self.array[i];
+            new_array[i] = self.array[i].clone();
         }
         self.array = new_array;
         Ok(new_capacity)
@@ -38,7 +38,7 @@ impl<T: Copy> ArrayStack<T> {
     }
 }
 
-impl<T: Copy> Stack<T> for ArrayStack<T> {
+impl<T: Clone> Stack<T> for ArrayStack<T> {
     fn push(&mut self, value: T) {
         if self.size() <= self.capacity() {
             self.array[self.stack_pointer] = Some(value);
@@ -56,7 +56,7 @@ impl<T: Copy> Stack<T> for ArrayStack<T> {
         }
 
         self.stack_pointer -= 1;
-        self.array[self.stack_pointer]
+        self.array[self.stack_pointer].clone()
     }
 
     fn peek(&self) -> Option<&T> {
