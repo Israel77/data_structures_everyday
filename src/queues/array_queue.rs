@@ -28,7 +28,7 @@ impl<T: Clone> ArrayQueue<T> {
 
     fn resize_buffer(&mut self, new_capacity: usize) {
         let mut new_buffer = vec![None; new_capacity].into_boxed_slice();
-        for (i, value) in self.buffer.into_iter().enumerate() {
+        for (i, value) in self.buffer.iter().enumerate() {
             let index = (i + self.capacity()) % self.capacity();
             new_buffer[index] = value.to_owned();
         }
